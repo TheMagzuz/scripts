@@ -1,0 +1,2 @@
+#!/bin/sh
+feh --bg-fill "/home/markus/Wallpaper/$(ls /home/markus/Wallpaper | shuf -n 1)"

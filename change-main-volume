@@ -1,0 +1,16 @@
+#!/bin/sh
+SINK=$(pactl get-default-sink)
+
+CHANGE=$1
+[ -z $CHANGE ] && CHANGE="+5"
+# If the change does not start with a + or -, assume it's a +
+[[ $CHANGE =~ [+-][0-9]+ ]] || CHANGE="+$CHANGE"
+
+# Make sure the change ends with a %
+[[ $CHANGE =~ [+-][0-9]+% ]] || CHANGE="$CHANGE%"
+
+pactl set-sink-mute $SINK false
+pactl set-sink-volume $SINK $CHANGE
+
+# Update dwmblocks
+sigdwmblocks 2

@@ -1,0 +1,2 @@
+#!/bin/sh
+gdbus call -e -d "org.mpris.MediaPlayer2.spotifyd" -o /org/mpris/MediaPlayer2 -m org.freedesktop.DBus.Properties.Set org.mpris.MediaPlayer2.Player "Shuffle" "true"

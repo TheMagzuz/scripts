@@ -1,0 +1,3 @@
+#!/bin/sh
+
+[ "$(echo -e 'No\nYes' | dmenu -p 'Close dwm?' -nf '#F00' -i)" = "Yes" ] && pkill dwm

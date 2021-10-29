@@ -1,0 +1,8 @@
+#!/bin/sh
+
+FILES=$HOME/.config/zshstart/font-names/*.sh
+
+for f in $FILES; do
+  [ $f = "i_all.sh" ] && continue
+  cat $f | awk '/^i=/ { gsub(/i=/, "", $1); gsub(/=\$i/, ""); gsub(/'\''/, "", $1); sub(/^i_/, "", $2); print $2 " " $1}'
+done

@@ -1,0 +1,5 @@
+#!/bin/sh 
+
+TOKEN=$(zenity --password --text "Please enter Bitwarden master password" | bw unlock --raw)
+[ $? != 0 ] && notify-send "Login failed" "Invalid password" && exit 1
+(printf "$TOKEN" | xclip -sel clip) && notify-send "Login successful" "Bitwarden token copied to the clipboard"

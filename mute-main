@@ -1,0 +1,6 @@
+#!/bin/sh
+SINK=$(get-main-sink)
+
+pactl set-sink-mute $SINK toggle
+
+sigdwmblocks 2

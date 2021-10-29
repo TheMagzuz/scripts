@@ -1,0 +1,2 @@
+#!/bin/sh
+printf "%s normal pages (%s characters)\n" "$(printf "scale=2; %s/2400\n" "$(($(texcount -char -total -template="{SUM}" "$@") + $(texcount -total -template="{SUM}" "$@")))" | bc)" "$(($(texcount -char -total -template="{SUM}" "$@") + $(texcount -total -template="{SUM}" "$@")))"

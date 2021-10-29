@@ -1,0 +1,8 @@
+#!/bin/sh
+char=`generate-char-names | dmenu | awk '{printf $2}'`
+
+[ -z $char ] && exit
+
+echo -n $char | xclip -selection clipboard
+echo -n $char | xclip -selection primary
+notify-send "Copied to clipboard" "Copied $char to clipboard"

@@ -1,0 +1,75 @@
+#!/bin/sh
+# This could probably be a lot faster by using dbus-send instead
+
+[ -z $(pidof spt) ] && exit 1
+
+md=`dbus-send --print-reply --session --dest=org.mpris.MediaPlayer2.spotifyd /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'Metadata' | awk '
+BEGIN {
+depth=0
+idx=0
+}
+{
+  if ($1 == "method") {
+    next
+  }
+  if (depth > 0) {
+    if (inArray) {
+      if ($1 == "]") {
+        inArray = 0
+        gsub(/,$/, "", keys[dictKey])
+        gsub(/^ /, "", keys[dictKey])
+        next
+      } else {
+        $1=""
+        gsub(/"/, "")
+        keys[dictKey] = keys[dictKey] $0 ","
+        next
+      }
+    }
+    if ($1 == "variant") {
+      if ($2 == "array") {
+        inArray = 1
+        next
+      }
+      $1 = ""
+      $2 = ""
+      gsub(/^[ \t]+/, "", $0)
+      gsub(/"/, "", $0)
+      keys[dictKey] = $0
+    }
+  if ($1 == "string") {
+    $1 = ""
+    gsub(/"/, "")
+    gsub(/^ /, "")
+    dictKey=$0
+  }
+}
+  if ($0 ~ /.*\(.*/) {
+    depth += 1
+  } else if ($0 ~ /.*\).*/) {
+  depth -= 1
+  }
+next
+}
+END {
+  for (key in keys) {
+    print key " " keys[key]
+  }
+}'`
+playing=`dbus-send --print-reply --session --dest=org.mpris.MediaPlayer2.spotifyd /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'PlaybackStatus' | awk '/variant/ { gsub(/"/, "", $3); print $3}'`
+
+shuffle=`dbus-send --print-reply --session --dest=org.mpris.MediaPlayer2.spotifyd /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'Shuffle' | awk '/variant/ { gsub(/"/, "", $3); print $3}'`
+track=`echo "$metadata" | awk ' /xesam:title/ {
+  $1 = ""
+  gsub(/^[ \t]+/, "", $0)
+  print $0
+}'`
+prevTrack=`cat /tmp/spotify-trackdata | awk ' /xesam:title/ {
+  $1 = ""
+  gsub(/^[ \t]+/, "", $0)
+  print $0
+}'`
+[ "$track" != "$prevTrack" ] && echo 0 > /tmp/spotify-scrollidx
+data="$md"$'\n'"playstatus $playing"$'\n'"shuffle $shuffle"
+echo "$data" > /tmp/spotify-trackdata
+sigdwmblocks 8

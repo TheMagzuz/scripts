@@ -1,0 +1,6 @@
+#!/bin/sh
+# Skips by default, or rewinds if $1 is set
+[ -z $1 ] && dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotifyd /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next > /dev/null
+[ ! -z $1 ] && dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotifyd /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous > /dev/null
+
+update-spotify-track

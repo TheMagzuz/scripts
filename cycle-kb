@@ -1,0 +1,14 @@
+#!/bin/sh
+layouts=(us dk)
+
+currentLayout=`setxkbmap -query | awk '/layout:/ {print $2}'`
+
+for l in ${layouts[@]}; do
+  [ ! -z $found ] && newLayout=$l && break
+  [ "$l" = "$currentLayout" ] && found=1
+done
+
+[ -z $newLayout ] && newLayout="$layouts"
+
+setxkbmap $newLayout
+sigdwmblocks 5

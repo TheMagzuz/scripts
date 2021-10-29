@@ -1,0 +1,19 @@
+#!/bin/sh
+####################
+# The first time this script is run, it will prompt for a screen area, and start recording.
+# The second time it is run, it will stop that recording
+####################
+[ -f "/tmp/recording" ] && touch /tmp/stop-recording && exit 0
+
+region=`slop`
+
+dimension=`cut -d'+' -f1 <<< "$region"`
+w=`cut -d'x' -f1 <<< "$dimension"`
+h=`cut -d'x' -f2 <<< "$dimension"`
+x=`cut -d'+' -f2 <<< "$region"`
+y=`cut -d'+' -f3 <<< "$region"`
+file="/home/markus/videos/$(date +%Y-%m-%d_%H-%M-%S).gif"
+touch /tmp/recording
+byzanz-record -x $x -y $y -w $w -h $h -d 5 -c -e 'wait-for-file "/tmp/stop-recording"' "$file"
+
+rm /tmp/recording /tmp/stop-recording
